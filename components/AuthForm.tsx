@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { createAccount, signInUser } from "@/lib/actions/user.actions";
 
 type Props = {
   type: "sign-in" | "sign-up";
@@ -38,6 +39,7 @@ const AuthForm = ({ type }: Props) => {
   const formSchema = authFormSchema(type);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [accountId, setAccountId] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -49,7 +51,7 @@ const AuthForm = ({ type }: Props) => {
   });
 
   // 2. Define a submit handler.
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     setIsLoading(true);
