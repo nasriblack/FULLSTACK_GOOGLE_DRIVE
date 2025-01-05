@@ -10,6 +10,7 @@ import { redirect } from "next/navigation";
 
 const getUserByEmail = async (email: string) => {
   const { databases } = await createAdminClient();
+  console.log('checking the databases', databases)
 
   const result = await databases.listDocuments(
     appwriteConfig.databaseId,
@@ -129,6 +130,7 @@ export const signOutUser = async () => {
 export const signInUser = async ({ email }: { email: string }) => {
   try {
     const existingUser = await getUserByEmail(email);
+    console.log('checking the existing', existingUser)
 
     // User exists, send OTP
     if (existingUser) {
