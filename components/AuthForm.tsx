@@ -1,13 +1,13 @@
 "use client";
 
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,11 +18,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { createAccount, signInUser } from "@/lib/actions/user.actions";
-import OTPModal from "./OTPModal";
-
-type Props = {
-  type: "sign-in" | "sign-up";
-};
+import OtpModal from "@/components/OTPModal";
 
 type FormType = "sign-in" | "sign-up";
 
@@ -36,13 +32,12 @@ const authFormSchema = (formType: FormType) => {
   });
 };
 
-const AuthForm = ({ type }: Props) => {
-  const formSchema = authFormSchema(type);
-
+const AuthForm = ({ type }: { type: FormType }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [accountId, setAccountId] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
-  // 1. Define your form.
+  const [accountId, setAccountId] = useState(null);
+
+  const formSchema = authFormSchema(type);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -51,10 +46,7 @@ const AuthForm = ({ type }: Props) => {
     },
   });
 
-  // 2. Define a submit handler.
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     setIsLoading(true);
     setErrorMessage("");
 
@@ -74,6 +66,7 @@ const AuthForm = ({ type }: Props) => {
       setIsLoading(false);
     }
   };
+
   return (
     <>
       <Form {...form}>
@@ -89,19 +82,22 @@ const AuthForm = ({ type }: Props) => {
                 <FormItem>
                   <div className="shad-form-item">
                     <FormLabel className="shad-form-label">Full Name</FormLabel>
+
                     <FormControl>
                       <Input
-                        className="shad-input"
                         placeholder="Enter your full name"
+                        className="shad-input"
                         {...field}
                       />
                     </FormControl>
                   </div>
-                  <FormMessage className="text-error" />
+
+                  <FormMessage className="shad-form-message" />
                 </FormItem>
               )}
             />
           )}
+
           <FormField
             control={form.control}
             name="email"
@@ -109,25 +105,28 @@ const AuthForm = ({ type }: Props) => {
               <FormItem>
                 <div className="shad-form-item">
                   <FormLabel className="shad-form-label">Email</FormLabel>
+
                   <FormControl>
                     <Input
+                      placeholder="Enter your email"
                       className="shad-input"
-                      placeholder="Enter your Email"
                       {...field}
                     />
                   </FormControl>
                 </div>
-                <FormMessage className="text-error" />
+
+                <FormMessage className="shad-form-message" />
               </FormItem>
             )}
           />
 
           <Button
-            disabled={isLoading}
             type="submit"
             className="form-submit-button"
+            disabled={isLoading}
           >
-            {type.replace("-", " ").toUpperCase()}
+            {type === "sign-in" ? "Sign In" : "Sign Up"}
+
             {isLoading && (
               <Image
                 src="/assets/icons/loader.svg"
@@ -138,6 +137,7 @@ const AuthForm = ({ type }: Props) => {
               />
             )}
           </Button>
+
           {errorMessage && <p className="error-message">*{errorMessage}</p>}
 
           <div className="body-2 flex justify-center">
@@ -156,8 +156,9 @@ const AuthForm = ({ type }: Props) => {
           </div>
         </form>
       </Form>
+
       {accountId && (
-        <OTPModal email={form.getValues("email")} accountId={accountId} />
+        <OtpModal email={form.getValues("email")} accountId={accountId} />
       )}
     </>
   );
